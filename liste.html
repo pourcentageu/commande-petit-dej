@@ -1,170 +1,91 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Liste des commandes</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f6f6f6; padding: 20px; }
-    h1 { text-align: center; margin-bottom: 20px; }
-    .card { background: white; padding: 20px; border-radius: 10px; max-width: 1100px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-    select, input, button { padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 10px; border-bottom: 1px solid #ddd; font-size: 14px; }
-    th { background: #fafafa; }
-    .muted { color: #777; }
-  </style>
+<meta charset="UTF-8">
+<title>Liste des commandes - Les Sh'artlock Holmes</title>
+<style>
+body {
+    margin:0;
+    padding:0;
+    font-family: Georgia, serif;
+    background-image: url('https://images.unsplash.com/photo-1520694478166-daaaaec95b69?auto=format&fit=crop&w=1950&q=80');
+    background-size: cover;
+    background-position: center;
+    color:#f5e6c8;
+    text-shadow: 1px 1px 2px #000;
+}
+.container {
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(3px);
+    padding: 30px;
+    max-width: 800px;
+    margin: 60px auto;
+    border-radius: 12px;
+    animation: slideIn 1s ease-out;
+}
+@keyframes slideIn {
+    from {opacity:0; transform: translateY(30px);}
+    to {opacity:1; transform: translateY(0);}
+}
+h1 {text-align:center; font-size:2.5rem; margin-bottom:20px; color:#b89b5e;}
+table {
+    width:100%;
+    border-collapse: collapse;
+    margin-top:20px;
+}
+th, td {
+    border: 1px solid #d0b77a;
+    padding:10px;
+    text-align:center;
+    font-size:1.1rem;
+}
+th {
+    background-color: rgba(184,155,94,0.3);
+}
+tr:nth-child(even) {background-color: rgba(255,255,255,0.05);}
+</style>
 </head>
 <body>
-
-  <h1>Commandes reçues</h1>
-
-  <div class="card">
-
-    <div class="filters">
-      <input id="search" placeholder="Rechercher (nom, lieu, item)">
-      <select id="filterVienno">
-        <option value="">Viennoiserie</option>
-        <option>Croissant</option>
-        <option>Pain au chocolat</option>
-      </select>
-      <select id="filterCereal">
-        <option value="">Céréales</option>
-        <option>Muesli</option>
-        <option>Trésors</option>
-      </select>
-      <select id="filterDrink">
-        <option value="">Boisson</option>
-        <option>Jus d'orange</option>
-        <option>Jus de pomme</option>
-        <option>Lait</option>
-      </select>
-      <select id="filterHour">
-        <option value="">Heure</option>
-        <option>08:00</option>
-        <option>08:15</option>
-        <option>08:30</option>
-        <option>08:45</option>
-        <option>09:00</option>
-      </select>
-      <button id="exportCsv">Exporter CSV</button>
-      <button id="clearAll">Supprimer tout</button>
-      <a href="index.html">Retour</a>
-    </div>
-
-    <div id="emptyMsg" class="muted" style="display:none;">Aucune commande trouvée.</div>
-
-    <table id="table" style="display:none;">
-      <thead>
+<div class="container">
+<h1>Liste des commandes</h1>
+<table>
+    <thead>
         <tr>
-          <th>#</th>
-          <th>Prénom</th>
-          <th>Nom</th>
-          <th>Lieu</th>
-          <th>Heure</th>
-          <th>Viennoiserie</th>
-          <th>Céréales</th>
-          <th>Boisson</th>
-          <th>Créé le</th>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Adresse</th>
+            <th>Viennoiserie</th>
+            <th>Céréales</th>
+            <th>Boisson</th>
+            <th>Heure</th>
         </tr>
-      </thead>
-      <tbody id="list"></tbody>
-    </table>
-
-  </div>
+    </thead>
+    <tbody id="table-body">
+    </tbody>
+</table>
+</div>
 
 <script>
-  const STORAGE = 'pd_orders_single';
-
-  function load() {
-    try { return JSON.parse(localStorage.getItem(STORAGE) || '[]'); }
-    catch { return []; }
-  }
-  function save(arr) {
-    localStorage.setItem(STORAGE, JSON.stringify(arr));
-  }
-
-  let orders = load();
-  const list = document.getElementById("list");
-  const table = document.getElementById("table");
-  const emptyMsg = document.getElementById("emptyMsg");
-
-  const search = document.getElementById("search");
-  const fv = document.getElementById("filterVienno");
-  const fc = document.getElementById("filterCereal");
-  const fd = document.getElementById("filterDrink");
-  const fh = document.getElementById("filterHour");
-
-  function render() {
-    orders = load();
-
-    const q = search.value.toLowerCase();
-
-    const filtered = orders.filter(o => {
-      if (q && !(o.fname + " " + o.lname + " " + o.place).toLowerCase().includes(q)) return false;
-      if (fv.value && o.vienno !== fv.value) return false;
-      if (fc.value && o.cereal !== fc.value) return false;
-      if (fd.value && o.drink !== fd.value) return false;
-      if (fh.value && o.time !== fh.value) return false;
-      return true;
-    });
-
-    if (!filtered.length) {
-      table.style.display = "none";
-      emptyMsg.style.display = "block";
-      return;
-    } else {
-      table.style.display = "table";
-      emptyMsg.style.display = "none";
+// Parcourir toutes les clés de localStorage qui commencent par "commande_"
+const tbody = document.getElementById("table-body");
+for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key.startsWith("commande_")){
+        const order = JSON.parse(localStorage.getItem(key));
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${order.prenom}</td>
+            <td>${order.nom}</td>
+            <td>${order.adresse}</td>
+            <td>${order.viennoiserie}</td>
+            <td>${order.cereales}</td>
+            <td>${order.boi}</td>
+            <td>${order.heure}</td>
+        `;
+        tbody.appendChild(tr);
     }
-
-    list.innerHTML = filtered.map((o, i) => `
-      <tr>
-        <td>${i+1}</td>
-        <td>${o.fname}</td>
-        <td>${o.lname}</td>
-        <td>${o.place}</td>
-        <td>${o.time}</td>
-        <td>${o.vienno || "-"}</td>
-        <td>${o.cereal || "-"}</td>
-        <td>${o.drink || "-"}</td>
-        <td>${new Date(o.created).toLocaleString()}</td>
-      </tr>
-    `).join("");
-  }
-
-  search.oninput = render;
-  fv.onchange = render;
-  fc.onchange = render;
-  fd.onchange = render;
-  fh.onchange = render;
-
-  document.getElementById("clearAll").onclick = () => {
-    if (confirm("Supprimer toutes les commandes ?")) {
-      save([]);
-      render();
-    }
-  };
-
-  document.getElementById("exportCsv").onclick = () => {
-    const rows = load();
-    if (!rows.length) return alert("Aucune commande à exporter");
-
-    const csv = [
-      "prenom,nom,lieu,heure,viennoiserie,cereale,boisson,created",
-      ...rows.map(r => `${r.fname},${r.lname},${r.place},${r.time},${r.vienno},${r.cereal},${r.drink},${r.created}`)
-    ].join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "commandes.csv";
-    link.click();
-  };
-
-  render();
+}
 </script>
-
 </body>
 </html>
+
