@@ -8,7 +8,7 @@ body {
     margin:0;
     padding:0;
     font-family: Georgia, serif;
-    background-image: url('https://images.unsplash.com/photo-1520694478166-daaaaec95b69?auto=format&fit=crop&w=1950&q=80');
+    background-image: url('https://images.unsplash.com/photo-1601758123927-11a9a1f35d44?auto=format&fit=crop&w=1950&q=80'); 
     background-size: cover;
     background-position: center;
     color:#f5e6c8;
@@ -77,9 +77,9 @@ for(let i=0;i<localStorage.length;i++){
             <td>${order.prenom}</td>
             <td>${order.nom}</td>
             <td>${order.adresse}</td>
-            <td>${order.viennoiserie}</td>
-            <td>${order.cereales}</td>
-            <td>${order.boi}</td>
+            <td>${order.viennoiserie || "—"}</td>
+            <td>${order.cereales || "—"}</td>
+            <td>${order.boi || "—"}</td>
             <td>${order.heure}</td>
         `;
         tbody.appendChild(tr);
