@@ -8,7 +8,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: "Georgia", serif;
-    background-image: url('https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1950&q=80');
+    background-image: url('https://images.unsplash.com/photo-1608499240564-2f6b7995f0c3?auto=format&fit=crop&w=1950&q=80'); 
     background-size: cover;
     background-position: center;
     color: #f2e6d0;
@@ -88,26 +88,26 @@ button:hover {
         <label>Adresse / Lieu de livraison</label>
         <input type="text" id="adresse" required>
 
-        <label>Viennoiserie</label>
-        <select id="viennoiserie" required>
-            <option value="">— Choisir —</option>
-            <option>Croissant</option>
-            <option>Pain au chocolat</option>
+        <label>Viennoiserie (0 ou 1)</label>
+        <select id="viennoiserie">
+            <option value="">Aucune</option>
+            <option value="Croissant">Croissant</option>
+            <option value="Pain au chocolat">Pain au chocolat</option>
         </select>
 
-        <label>Céréales</label>
-        <select id="cereales" required>
-            <option value="">— Choisir —</option>
-            <option>Muesli</option>
-            <option>Trésor</option>
+        <label>Céréales (0 ou 1)</label>
+        <select id="cereales">
+            <option value="">Aucune</option>
+            <option value="Muesli">Muesli</option>
+            <option value="Trésor">Trésor</option>
         </select>
 
-        <label>Boisson</label>
-        <select id="boisson" required>
-            <option value="">— Choisir —</option>
-            <option>Jus d'orange</option>
-            <option>Jus de pomme</option>
-            <option>Lait</option>
+        <label>Boisson (0 ou 1)</label>
+        <select id="boisson">
+            <option value="">Aucune</option>
+            <option value="Jus d'orange">Jus d'orange</option>
+            <option value="Jus de pomme">Jus de pomme</option>
+            <option value="Lait">Lait</option>
         </select>
 
         <label>Heure de livraison (entre 08:00 et 09:00)</label>
@@ -124,9 +124,9 @@ function envoyerCommande(e) {
     const prenom = document.getElementById("prenom").value.trim();
     const nom = document.getElementById("nom").value.trim();
     const adresse = document.getElementById("adresse").value.trim();
-    const vien = document.getElementById("viennoiserie").value;
-    const cer = document.getElementById("cereales").value;
-    const boi = document.getElementById("boisson").value;
+    const viennoiserie = document.getElementById("viennoiserie").value;
+    const cereales = document.getElementById("cereales").value;
+    const boisson = document.getElementById("boisson").value;
     const heure = document.getElementById("heure").value;
 
     // Validation heure correcte
@@ -144,13 +144,20 @@ function envoyerCommande(e) {
     }
 
     // Enregistrement
-    const data = { prenom, nom, adresse, vien, cer, boi, heure };
+    const data = {
+        prenom: prenom,
+        nom: nom,
+        adresse: adresse,
+        viennoiserie: viennoiserie || "—",
+        cereales: cereales || "—",
+        boi: boisson || "—",
+        heure: heure
+    };
     localStorage.setItem("commande_" + prenom + "_" + nom, JSON.stringify(data));
 
     // Redirection
     window.location.href = "merci.html";
 }
 </script>
-
 </body>
 </html>
