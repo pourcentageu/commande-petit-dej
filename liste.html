@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Liste des commandes</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f6f6f6; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    .card { background: white; padding: 20px; border-radius: 10px; max-width: 1100px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    select, input, button { padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 10px; border-bottom: 1px solid #ddd; font-size: 14px; }
+    th { background: #fafafa; }
+    .muted { color: #777; }
+  </style>
+</head>
+<body>
+
+  <h1>Commandes reçues</h1>
+
+  <div class="card">
+
+    <div class="filters">
+      <input id="search" placeholder="Rechercher (nom, lieu, item)">
+      <select id="filterVienno">
+        <option value="">Viennoiserie</option>
+        <option>Croissant</option>
+        <option>Pain au chocolat</option>
+      </select>
+      <select id="filterCereal">
+        <option value="">Céréales</option>
+        <option>Muesli</option>
+        <option>Trésors</option>
+      </select>
+      <select id="filterDrink">
+        <option value="">Boisson</option>
+        <option>Jus d'orange</option>
+        <option>Jus de pomme</option>
+        <option>Lait</option>
+      </select>
+      <select id="filterHour">
+        <option value="">Heure</option>
+        <option>08:00</option>
+        <option>08:15</option>
+        <option>08:30</option>
+        <option>08:45</option>
+        <option>09:00</option>
+      </select>
+      <button id="exportCsv">Exporter CSV</button>
+      <button id="clearAll">Supprimer tout</button>
+      <a href="index.html">Retour</a>
+    </div>
+
+    <div id="emptyMsg" class="muted" style="display:none;">Aucune commande trouvée.</div>
+
+    <table id="table" style="display:none;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Prénom</th>
+          <th>Nom</th>
+          <th>Lieu</th>
+          <th>Heure</th>
+          <th>Viennoiserie</th>
+          <th>Céréales</th>
+          <th>Boisson</th>
+          <th>Créé le</th>
+        </tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
+
+  </div>
+
+<script>
+  const STORAGE = 'pd_orders_single';
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORAGE) || '[]'); }
+    catch { return []; }
+  }
+  function save(arr) {
+    localStorage.setItem(STORAGE, JSON.stringify(arr));
+  }
+
+  let orders = load();
+  const list = document.getElementById("list");
+  const table = document.getElementById("table");
+  const emptyMsg = document.getElementById("emptyMsg");
+
+  const search = document.getElementById("search");
+  const fv = document.getElementById("filterVienno");
+  const fc = document.getElementById("filterCereal");
+  const fd = document.getElementById("filterDrink");
+  const fh = document.getElementById("filterHour");
+
+  function render() {
+    orders = load();
+
+    const q = search.value.toLowerCase();
+
+    const filtered = orders.filter(o => {
+      if (q && !(o.fname + " " + o.lname + " " + o.place).toLowerCase().includes(q)) return false;
+      if (fv.value && o.vienno !== fv.value) return false;
+      if (fc.value && o.cereal !== fc.value) return false;
+      if (fd.value && o.drink !== fd.value) return false;
+      if (fh.value && o.time !== fh.value) return false;
+      return true;
+    });
+
+    if (!filtered.length) {
+      table.style.display = "none";
+      emptyMsg.style.display = "block";
+      return;
+    } else {
+      table.style.display = "table";
+      emptyMsg.style.display = "none";
+    }
+
+    list.innerHTML = filtered.map((o, i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td>${o.fname}</td>
+        <td>${o.lname}</td>
+        <td>${o.place}</td>
+        <td>${o.time}</td>
+        <td>${o.vienno || "-"}</td>
+        <td>${o.cereal || "-"}</td>
+        <td>${o.drink || "-"}</td>
+        <td>${new Date(o.created).toLocaleString()}</td>
+      </tr>
+    `).join("");
+  }
+
+  search.oninput = render;
+  fv.onchange = render;
+  fc.onchange = render;
+  fd.onchange = render;
+  fh.onchange = render;
+
+  document.getElementById("clearAll").onclick = () => {
+    if (confirm("Supprimer toutes les commandes ?")) {
+      save([]);
+      render();
+    }
+  };
+
+  document.getElementById("exportCsv").onclick = () => {
+    const rows = load();
+    if (!rows.length) return alert("Aucune commande à exporter");
+
+    const csv = [
+      "prenom,nom,lieu,heure,viennoiserie,cereale,boisson,created",
+      ...rows.map(r => `${r.fname},${r.lname},${r.place},${r.time},${r.vienno},${r.cereal},${r.drink},${r.created}`)
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "commandes.csv";
+    link.click();
+  };
+
+  render();
+</script>
+
+</body>
+</html>

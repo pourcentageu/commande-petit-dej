@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Commande - Petit Déjeuner Mystérieux</title>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Georgia", serif;
+    background-image: url('https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1950&q=80');
+    background-size: cover;
+    background-position: center;
+    color: #f2e6d0;
+    text-shadow: 1px 1px 3px #000;
+}
+
+.overlay {
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(3px);
+    padding: 30px;
+    max-width: 750px;
+    margin: 40px auto;
+    border-radius: 12px;
+    animation: slideIn 1.2s ease-out;
+}
+
+@keyframes slideIn {
+    from {transform: translateY(40px); opacity: 0;}
+    to {transform: translateY(0); opacity: 1;}
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-size: 20px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: none;
+    font-size: 18px;
+}
+
+button {
+    margin-top: 25px;
+    padding: 15px;
+    width: 100%;
+    font-size: 22px;
+    cursor: pointer;
+    border: none;
+    background: #b89b5e;
+    color: #fff;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+button:hover {
+    background: #d0b77a;
+    transform: scale(1.05);
+}
+
+.warning {
+    background: rgba(120,0,0,0.7);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 18px;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+<div class="overlay">
+    <h1>Formulaire de Commande 🔍</h1>
+    <p class="warning">⚠️ Une seule commande par personne est autorisée.</p>
+
+    <form onsubmit="return envoyerCommande(event)">
+        <label>Prénom</label>
+        <input type="text" id="prenom" required>
+
+        <label>Nom</label>
+        <input type="text" id="nom" required>
+
+        <label>Adresse / Lieu de livraison</label>
+        <input type="text" id="adresse" required>
+
+        <label>Viennoiserie</label>
+        <select id="viennoiserie" required>
+            <option value="">— Choisir —</option>
+            <option>Croissant</option>
+            <option>Pain au chocolat</option>
+        </select>
+
+        <label>Céréales</label>
+        <select id="cereales" required>
+            <option value="">— Choisir —</option>
+            <option>Muesli</option>
+            <option>Trésor</option>
+        </select>
+
+        <label>Boisson</label>
+        <select id="boisson" required>
+            <option value="">— Choisir —</option>
+            <option>Jus d'orange</option>
+            <option>Jus de pomme</option>
+            <option>Lait</option>
+        </select>
+
+        <label>Heure de livraison (entre 08:00 et 09:00)</label>
+        <input type="time" id="heure" required step="60">
+
+        <button type="submit">Valider ma commande ✔️</button>
+    </form>
+</div>
+
+<script>
+function envoyerCommande(e) {
+    e.preventDefault();
+
+    const prenom = document.getElementById("prenom").value.trim();
+    const nom = document.getElementById("nom").value.trim();
+    const adresse = document.getElementById("adresse").value.trim();
+    const vien = document.getElementById("viennoiserie").value;
+    const cer = document.getElementById("cereales").value;
+    const boi = document.getElementById("boisson").value;
+    const heure = document.getElementById("heure").value;
+
+    // Validation heure correcte
+    const h = parseInt(heure.split(":")[0]);
+    const m = parseInt(heure.split(":")[1]);
+    if (h !== 8 && !(h === 9 && m === 0)) {
+        alert("L’heure doit être comprise entre 08:00 et 09:00 !");
+        return false;
+    }
+
+    // Une commande par personne
+    if (localStorage.getItem("commande_" + prenom + "_" + nom)) {
+        alert("Vous avez déjà passé une commande !");
+        return false;
+    }
+
+    // Enregistrement
+    const data = { prenom, nom, adresse, vien, cer, boi, heure };
+    localStorage.setItem("commande_" + prenom + "_" + nom, JSON.stringify(data));
+
+    // Redirection
+    window.location.href = "merci.html";
+}
+</script>
+
+</body>
+</html>
