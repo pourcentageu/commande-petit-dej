@@ -7,18 +7,14 @@
 <style>
     body {
         font-family: "Georgia", serif;
-        background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1600&q=80');
-        background-size: cover;
-        background-attachment: fixed;
-        background-position: center;
         margin: 0;
-        padding: 0;
+        background: #efe9d9;
         color: #222;
     }
 
     header {
         width: 100%;
-        background: rgba(0,0,0,0.6);
+        background: #3b2f2f;
         padding: 20px;
         text-align: center;
         color: white;
@@ -31,15 +27,15 @@
         position: absolute;
         top: 5px;
         right: 10px;
-        width: 110px;
+        width: 180px;
     }
 
     table {
         width: 95%;
         margin: 40px auto;
         border-collapse: collapse;
-        background: rgba(255,255,255,0.9);
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        background: white;
+        box-shadow: 0 0 20px rgba(0,0,0,0.4);
     }
 
     th, td {
@@ -56,20 +52,18 @@
 
     h2 {
         text-align: center;
-        color: white;
-        text-shadow: 0 0 10px black;
+        margin-top: 20px;
     }
 
     #totaux {
         width: 60%;
         margin: 20px auto;
-        background: rgba(255,255,255,0.95);
+        background: white;
         padding: 20px;
         border-radius: 10px;
         font-size: 18px;
         box-shadow: 0 0 15px rgba(0,0,0,0.4);
     }
-
 </style>
 </head>
 
@@ -89,11 +83,9 @@
             <th>Prénom</th>
             <th>Adresse</th>
             <th>Heure</th>
-
-            <th>Croissant</th><th>Qté</th>
-            <th>Pain Choco</th><th>Qté</th>
-            <th>Céréales</th><th>Qté</th>
-            <th>Lait</th><th>Qté</th>
+            <th>Viennoiserie</th>
+            <th>Céréales</th>
+            <th>Boisson</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -102,77 +94,59 @@
 <div id="totaux"></div>
 
 <script>
-// -----------------------
-// FONCTIONS ANTI-UNDEFINED
-// -----------------------
-function safeItem(cat) {
-    return cat && cat.item ? cat.item : "";
-}
-function safeQty(cat) {
-    return cat && typeof cat.qty !== "undefined" ? cat.qty : 0;
-}
-
-// -----------------------
-// CHARGER LES COMMANDES
-// -----------------------
 let commandes = JSON.parse(localStorage.getItem("commandes") || "[]");
 
-// tri par heure croissante
-commandes.sort((a, b) => {
-    return a.heure.localeCompare(b.heure);
-});
+// tri par heure
+commandes.sort((a, b) => a.heure.localeCompare(b.heure));
 
 let tbody = document.querySelector("tbody");
 
 // totaux
 let totalCroissant = 0;
 let totalPainChoco = 0;
-let totalCereales = 0;
+let totalMuesli = 0;
+let totalTresor = 0;
 let totalLait = 0;
+let totalJOP = 0;
+let totalJOPo = 0;
 
-// -----------------------
-// AFFICHAGE DES COMMANDES
-// -----------------------
-commandes.forEach(entry => {
+commandes.forEach(c => {
 
-    totalCroissant += safeQty(entry.croissant);
-    totalPainChoco += safeQty(entry.painchoco);
-    totalCereales += safeQty(entry.cereales);
-    totalLait += safeQty(entry.lait);
+    // comptage total
+    if (c.viennoiserie === "Croissant") totalCroissant++;
+    if (c.viennoiserie === "Pain au chocolat") totalPainChoco++;
+
+    if (c.cereales === "Muesli") totalMuesli++;
+    if (c.cereales === "Tresor") totalTresor++;
+
+    if (c.boisson === "Lait") totalLait++;
+    if (c.boisson === "Jus d'orange") totalJOP++;
+    if (c.boisson === "Jus de pomme") totalJOPo++;
 
     let tr = document.createElement("tr");
 
     tr.innerHTML = `
-        <td>${entry.nom}</td>
-        <td>${entry.prenom}</td>
-        <td>${entry.adresse}</td>
-        <td>${entry.heure}</td>
-
-        <td>${safeItem(entry.croissant)}</td>
-        <td>${safeQty(entry.croissant)}</td>
-
-        <td>${safeItem(entry.painchoco)}</td>
-        <td>${safeQty(entry.painchoco)}</td>
-
-        <td>${safeItem(entry.cereales)}</td>
-        <td>${safeQty(entry.cereales)}</td>
-
-        <td>${safeItem(entry.lait)}</td>
-        <td>${safeQty(entry.lait)}</td>
+        <td>${c.nom}</td>
+        <td>${c.prenom}</td>
+        <td>${c.adresse}</td>
+        <td>${c.heure}</td>
+        <td>${c.viennoiserie || ""}</td>
+        <td>${c.cereales || ""}</td>
+        <td>${c.boisson || ""}</td>
     `;
 
     tbody.appendChild(tr);
 });
 
-// -----------------------
-// AFFICHAGE DES TOTAUX
-// -----------------------
 document.getElementById("totaux").innerHTML = `
     <h3>Totaux :</h3>
     <p><b>Croissants :</b> ${totalCroissant}</p>
     <p><b>Pains au chocolat :</b> ${totalPainChoco}</p>
-    <p><b>Céréales :</b> ${totalCereales}</p>
+    <p><b>Muesli :</b> ${totalMuesli}</p>
+    <p><b>Trésor :</b> ${totalTresor}</p>
     <p><b>Lait :</b> ${totalLait}</p>
+    <p><b>Jus d'orange :</b> ${totalJOP}</p>
+    <p><b>Jus de pomme :</b> ${totalJOPo}</p>
 `;
 </script>
 
