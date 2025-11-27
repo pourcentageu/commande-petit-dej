@@ -2,128 +2,121 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Liste des commandes – Sh'Artlock Holmes</title>
-
+<title>Liste des commandes</title>
 <style>
     body {
         font-family: Arial, sans-serif;
-        margin: 20px;
+        margin: 30px;
     }
 
-    header img {
-        width: 180px;
+    .logo {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 15px;
+        right: 15px;
+        width: 80px;
+        height: auto;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 40px;
-    }
-
-    th, td {
-        border: 1px solid #555;
-        padding: 10px;
-        text-align: center;
-    }
-
-    th {
-        background: #ddd;
-    }
-
-    h1 {
-        margin-bottom: 40px;
-    }
-
-    .totaux {
         margin-top: 30px;
-        padding: 15px;
-        background: #eee;
-        border-radius: 8px;
-        width: fit-content;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
     }
 </style>
 </head>
-
 <body>
 
-<header>
-    <img src="logo.png" alt="logo">
-</header>
+<img src="logo.png" class="logo">
 
 <h1>Liste des commandes</h1>
 
-<table id="table">
-    <tr>
-        <th>Prénom</th>
-        <th>Nom</th>
-        <th>Adresse</th>
-        <th>Heure</th>
-        <th>Viennoiserie</th>
-        <th>Céréales</th>
-        <th>Boisson</th>
-    </tr>
+<table>
+    <thead>
+        <tr>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Adresse</th>
+            <th>Heure</th>
+            <th>Viennoiserie</th>
+            <th>Céréale</th>
+            <th>Boisson</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
 </table>
 
-<div class="totaux" id="totaux"></div>
+<h2>Totaux</h2>
+<ul id="totaux"></ul>
 
 <script>
-function afficherListe() {
-    let commandes = JSON.parse(localStorage.getItem("commandes") || "[]");
+// --- Paramètres GitHub ---
+const GITHUB_USER = "TON_USERNAME";      // <-- remplace par ton nom d'utilisateur GitHub
+const GITHUB_REPO = "TON_REPO";          // <-- remplace par ton dépôt
+const GITHUB_FILE = "commandes.json";    // fichier où sont stockées les commandes
 
-    commandes.sort((a, b) => a.heure.localeCompare(b.heure));
+async function chargerCommandes() {
+    try {
+        let res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`);
+        if (!res.ok) throw new Error("Impossible de récupérer les commandes");
+        let data = await res.json();
 
-    const table = document.getElementById("table");
+        // Le contenu est encodé en base64
+        let commandes = JSON.parse(atob(data.content));
 
-    let total = {
-        croissant: 0,
-        painchoco: 0,
-        muesli: 0,
-        tresor: 0,
-        lait: 0,
-        orange: 0,
-        pomme: 0
-    };
+        // Tri par heure
+        commandes.sort((a, b) => a.heure.localeCompare(b.heure));
 
-    commandes.forEach(cmd => {
-        let tr = document.createElement("tr");
+        let body = document.getElementById("tableBody");
 
-        tr.innerHTML = `
-            <td>${cmd.prenom}</td>
-            <td>${cmd.nom}</td>
-            <td>${cmd.adresse}</td>
-            <td>${cmd.heure}</td>
-            <td>${cmd.viennoiserie || "–"}</td>
-            <td>${cmd.cereales || "–"}</td>
-            <td>${cmd.boisson || "–"}</td>
-        `;
-        table.appendChild(tr);
+        let total = {
+            "Croissant": 0,
+            "Pain au chocolat": 0,
+            "Muesli": 0,
+            "Trésor": 0,
+            "Lait": 0,
+            "Jus d'orange": 0,
+            "Jus de pomme": 0
+        };
 
-        // Totaux
-        if (cmd.viennoiserie === "Croissant") total.croissant++;
-        if (cmd.viennoiserie === "Pain au chocolat") total.painchoco++;
-        if (cmd.cereales === "Muesli") total.muesli++;
-        if (cmd.cereales === "Tresor") total.tresor++;
-        if (cmd.boisson === "Lait") total.lait++;
-        if (cmd.boisson === "Jus d'orange") total.orange++;
-        if (cmd.boisson === "Jus de pomme") total.pomme++;
-    });
+        commandes.forEach(c => {
+            let row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${c.prenom}</td>
+                <td>${c.nom}</td>
+                <td>${c.adresse}</td>
+                <td>${c.heure}</td>
+                <td>${c.viennoiserie}</td>
+                <td>${c.cereales}</td>
+                <td>${c.boisson}</td>
+            `;
 
-    document.getElementById("totaux").innerHTML = `
-        <b>Totaux :</b><br>
-        Croissants : ${total.croissant}<br>
-        Pains au chocolat : ${total.painchoco}<br>
-        Muesli : ${total.muesli}<br>
-        Trésor : ${total.tresor}<br>
-        Lait : ${total.lait}<br>
-        Jus d'orange : ${total.orange}<br>
-        Jus de pomme : ${total.pomme}
-    `;
+            if (c.viennoiserie in total) total[c.viennoiserie]++;
+            if (c.cereales in total) total[c.cereales]++;
+            if (c.boisson in total) total[c.boisson]++;
+
+            body.appendChild(row);
+        });
+
+        let totaux = document.getElementById("totaux");
+        for (let item in total) {
+            let li = document.createElement("li");
+            li.textContent = item + " : " + total[item];
+            totaux.appendChild(li);
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Erreur lors du chargement des commandes depuis GitHub.");
+    }
 }
 
-afficherListe();
+// Charger les commandes au démarrage
+chargerCommandes();
 </script>
 
 </body>
