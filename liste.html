@@ -1,104 +1,129 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des commandes – Sh'Artlock Holmes</title>
+<meta charset="UTF-8">
+<title>Liste des commandes – Sh'Artlock Holmes</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        header img {
-            width: 140px;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-        h1 {
-            margin-top: 80px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: center;
-        }
-        .totaux {
-            margin-top: 30px;
-        }
-    </style>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+
+    header img {
+        width: 180px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 40px;
+    }
+
+    th, td {
+        border: 1px solid #555;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background: #ddd;
+    }
+
+    h1 {
+        margin-bottom: 40px;
+    }
+
+    .totaux {
+        margin-top: 30px;
+        padding: 15px;
+        background: #eee;
+        border-radius: 8px;
+        width: fit-content;
+    }
+</style>
 </head>
+
 <body>
 
 <header>
-    <img src="logo.png" alt="Logo Sh'Artlock Holmes">
+    <img src="logo.png" alt="logo">
 </header>
 
 <h1>Liste des commandes</h1>
 
-<table>
-    <thead>
-        <tr>
-            <th>Heure</th>
-            <th>Viennoiserie</th>
-            <th>Céréale</th>
-            <th>Boisson</th>
-        </tr>
-    </thead>
-    <tbody id="listeCommandes"></tbody>
+<table id="table">
+    <tr>
+        <th>Prénom</th>
+        <th>Nom</th>
+        <th>Adresse</th>
+        <th>Heure</th>
+        <th>Viennoiserie</th>
+        <th>Céréales</th>
+        <th>Boisson</th>
+    </tr>
 </table>
 
-<div class="totaux">
-    <h2>Totaux</h2>
-    <ul id="totauxListe"></ul>
-</div>
+<div class="totaux" id="totaux"></div>
 
 <script>
-let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
+function afficherListe() {
+    let commandes = JSON.parse(localStorage.getItem("commandes") || "[]");
 
-// tri croissant par heure
-commandes.sort((a, b) => a.heure - b.heure);
+    commandes.sort((a, b) => a.heure.localeCompare(b.heure));
 
-let tbody = document.getElementById("listeCommandes");
+    const table = document.getElementById("table");
 
-let totaux = {
-    "Croissant": 0,
-    "Pain au chocolat": 0,
-    "Muesli": 0,
-    "Trésor": 0,
-    "Lait": 0,
-    "Jus d'orange": 0,
-    "Jus de pomme": 0
-};
+    let total = {
+        croissant: 0,
+        painchoco: 0,
+        muesli: 0,
+        tresor: 0,
+        lait: 0,
+        orange: 0,
+        pomme: 0
+    };
 
-commandes.forEach(cmd => {
-    if (cmd.viennoiserie) totaux[cmd.viennoiserie]++;
-    if (cmd.cereale) totaux[cmd.cereale]++;
-    if (cmd.boisson) totaux[cmd.boisson]++;
+    commandes.forEach(cmd => {
+        let tr = document.createElement("tr");
 
-    let tr = document.createElement("tr");
-    tr.innerHTML = `
-        <td>${new Date(cmd.heure).toLocaleTimeString()}</td>
-        <td>${cmd.viennoiserie || "-"}</td>
-        <td>${cmd.cereale || "-"}</td>
-        <td>${cmd.boisson || "-"}</td>
+        tr.innerHTML = `
+            <td>${cmd.prenom}</td>
+            <td>${cmd.nom}</td>
+            <td>${cmd.adresse}</td>
+            <td>${cmd.heure}</td>
+            <td>${cmd.viennoiserie || "–"}</td>
+            <td>${cmd.cereales || "–"}</td>
+            <td>${cmd.boisson || "–"}</td>
+        `;
+        table.appendChild(tr);
+
+        // Totaux
+        if (cmd.viennoiserie === "Croissant") total.croissant++;
+        if (cmd.viennoiserie === "Pain au chocolat") total.painchoco++;
+        if (cmd.cereales === "Muesli") total.muesli++;
+        if (cmd.cereales === "Tresor") total.tresor++;
+        if (cmd.boisson === "Lait") total.lait++;
+        if (cmd.boisson === "Jus d'orange") total.orange++;
+        if (cmd.boisson === "Jus de pomme") total.pomme++;
+    });
+
+    document.getElementById("totaux").innerHTML = `
+        <b>Totaux :</b><br>
+        Croissants : ${total.croissant}<br>
+        Pains au chocolat : ${total.painchoco}<br>
+        Muesli : ${total.muesli}<br>
+        Trésor : ${total.tresor}<br>
+        Lait : ${total.lait}<br>
+        Jus d'orange : ${total.orange}<br>
+        Jus de pomme : ${total.pomme}
     `;
-    tbody.appendChild(tr);
-});
+}
 
-// affichage totaux
-let ul = document.getElementById("totauxListe");
-Object.keys(totaux).forEach(item => {
-    let li = document.createElement("li");
-    li.textContent = `${item} : ${totaux[item]}`;
-    ul.appendChild(li);
-});
+afficherListe();
 </script>
 
 </body>
