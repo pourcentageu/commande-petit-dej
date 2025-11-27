@@ -1,153 +1,104 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Liste des commandes – Sh'Artlock Holmes</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des commandes – Sh'Artlock Holmes</title>
 
-<style>
-    body {
-        font-family: "Georgia", serif;
-        margin: 0;
-        background: #efe9d9;
-        color: #222;
-    }
-
-    header {
-        width: 100%;
-        background: #3b2f2f;
-        padding: 20px;
-        text-align: center;
-        color: white;
-        font-size: 32px;
-        position: relative;
-        letter-spacing: 2px;
-    }
-
-    #logo {
-        position: absolute;
-        top: 5px;
-        right: 10px;
-        width: 180px;
-    }
-
-    table {
-        width: 95%;
-        margin: 40px auto;
-        border-collapse: collapse;
-        background: white;
-        box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
-
-    th, td {
-        border: 1px solid #555;
-        padding: 10px;
-        text-align: center;
-    }
-
-    th {
-        background: #3b2f2f;
-        color: white;
-        font-size: 18px;
-    }
-
-    h2 {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    #totaux {
-        width: 60%;
-        margin: 20px auto;
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        font-size: 18px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.4);
-    }
-</style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        header img {
+            width: 140px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        h1 {
+            margin-top: 80px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+        .totaux {
+            margin-top: 30px;
+        }
+    </style>
 </head>
-
 <body>
 
 <header>
-    Liste des commandes  
-    <img id="logo" src="https://pourcentageu.github.io/commande-petit-dej/logo.png">
+    <img src="logo.png" alt="Logo Sh'Artlock Holmes">
 </header>
 
-<h2>Commandes classées par heure</h2>
+<h1>Liste des commandes</h1>
 
-<table id="table">
+<table>
     <thead>
         <tr>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Adresse</th>
             <th>Heure</th>
             <th>Viennoiserie</th>
-            <th>Céréales</th>
+            <th>Céréale</th>
             <th>Boisson</th>
         </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="listeCommandes"></tbody>
 </table>
 
-<div id="totaux"></div>
+<div class="totaux">
+    <h2>Totaux</h2>
+    <ul id="totauxListe"></ul>
+</div>
 
 <script>
-let commandes = JSON.parse(localStorage.getItem("commandes") || "[]");
+let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
 
-// tri par heure
-commandes.sort((a, b) => a.heure.localeCompare(b.heure));
+// tri croissant par heure
+commandes.sort((a, b) => a.heure - b.heure);
 
-let tbody = document.querySelector("tbody");
+let tbody = document.getElementById("listeCommandes");
 
-// totaux
-let totalCroissant = 0;
-let totalPainChoco = 0;
-let totalMuesli = 0;
-let totalTresor = 0;
-let totalLait = 0;
-let totalJOP = 0;
-let totalJOPo = 0;
+let totaux = {
+    "Croissant": 0,
+    "Pain au chocolat": 0,
+    "Muesli": 0,
+    "Trésor": 0,
+    "Lait": 0,
+    "Jus d'orange": 0,
+    "Jus de pomme": 0
+};
 
-commandes.forEach(c => {
-
-    // comptage total
-    if (c.viennoiserie === "Croissant") totalCroissant++;
-    if (c.viennoiserie === "Pain au chocolat") totalPainChoco++;
-
-    if (c.cereales === "Muesli") totalMuesli++;
-    if (c.cereales === "Tresor") totalTresor++;
-
-    if (c.boisson === "Lait") totalLait++;
-    if (c.boisson === "Jus d'orange") totalJOP++;
-    if (c.boisson === "Jus de pomme") totalJOPo++;
+commandes.forEach(cmd => {
+    if (cmd.viennoiserie) totaux[cmd.viennoiserie]++;
+    if (cmd.cereale) totaux[cmd.cereale]++;
+    if (cmd.boisson) totaux[cmd.boisson]++;
 
     let tr = document.createElement("tr");
-
     tr.innerHTML = `
-        <td>${c.nom}</td>
-        <td>${c.prenom}</td>
-        <td>${c.adresse}</td>
-        <td>${c.heure}</td>
-        <td>${c.viennoiserie || ""}</td>
-        <td>${c.cereales || ""}</td>
-        <td>${c.boisson || ""}</td>
+        <td>${new Date(cmd.heure).toLocaleTimeString()}</td>
+        <td>${cmd.viennoiserie || "-"}</td>
+        <td>${cmd.cereale || "-"}</td>
+        <td>${cmd.boisson || "-"}</td>
     `;
-
     tbody.appendChild(tr);
 });
 
-document.getElementById("totaux").innerHTML = `
-    <h3>Totaux :</h3>
-    <p><b>Croissants :</b> ${totalCroissant}</p>
-    <p><b>Pains au chocolat :</b> ${totalPainChoco}</p>
-    <p><b>Muesli :</b> ${totalMuesli}</p>
-    <p><b>Trésor :</b> ${totalTresor}</p>
-    <p><b>Lait :</b> ${totalLait}</p>
-    <p><b>Jus d'orange :</b> ${totalJOP}</p>
-    <p><b>Jus de pomme :</b> ${totalJOPo}</p>
-`;
+// affichage totaux
+let ul = document.getElementById("totauxListe");
+Object.keys(totaux).forEach(item => {
+    let li = document.createElement("li");
+    li.textContent = `${item} : ${totaux[item]}`;
+    ul.appendChild(li);
+});
 </script>
 
 </body>
