@@ -2,130 +2,178 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Liste des commandes - Sh’Artlock Holmes</title>
+<title>Liste des commandes – Sh'Artlock Holmes</title>
+
 <style>
-body {
-    margin:0;
-    padding:0;
-    font-family: Georgia, serif;
-    background-image: url('https://images.unsplash.com/photo-1529676468690-d203659b102c?auto=format&fit=crop&w=1950&q=80');
-    background-size: cover;
-    background-position: center;
-    color:#f5e6c8;
-    text-shadow: 1px 1px 2px #000;
-}
-.container {
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(3px);
-    padding: 30px;
-    max-width: 900px;
-    margin: 60px auto;
-    border-radius: 12px;
-}
-.logo {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    width: 140px;
-}
-h1 {text-align:center; font-size:2.5rem; margin-bottom:20px; color:#b89b5e;}
-table {
-    width:100%;
-    border-collapse: collapse;
-    margin-top:20px;
-}
-th, td {
-    border: 1px solid #d0b77a;
-    padding:10px;
-    text-align:center;
-    font-size:1.1rem;
-}
-th {
-    background-color: rgba(184,155,94,0.3);
-}
-tr:nth-child(even) {background-color: rgba(255,255,255,0.05);}
-.summary {
-    margin-top: 25px;
-    background: rgba(255,255,255,0.08);
-    padding: 15px;
-    border-radius: 8px;
-}
+    body {
+        font-family: "Georgia", serif;
+        background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1600&q=80');
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+        margin: 0;
+        padding: 0;
+        color: #222;
+    }
+
+    header {
+        width: 100%;
+        background: rgba(0,0,0,0.6);
+        padding: 20px;
+        text-align: center;
+        color: white;
+        font-size: 32px;
+        position: relative;
+        letter-spacing: 2px;
+    }
+
+    #logo {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        width: 110px;
+    }
+
+    table {
+        width: 95%;
+        margin: 40px auto;
+        border-collapse: collapse;
+        background: rgba(255,255,255,0.9);
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    th, td {
+        border: 1px solid #555;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background: #3b2f2f;
+        color: white;
+        font-size: 18px;
+    }
+
+    h2 {
+        text-align: center;
+        color: white;
+        text-shadow: 0 0 10px black;
+    }
+
+    #totaux {
+        width: 60%;
+        margin: 20px auto;
+        background: rgba(255,255,255,0.95);
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 18px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
 </style>
 </head>
+
 <body>
 
-<img src="logo.png" class="logo">
+<header>
+    Liste des commandes  
+    <img id="logo" src="https://pourcentageu.github.io/commande-petit-dej/logo.png">
+</header>
 
-<div class="container">
-<h1>Liste des commandes</h1>
+<h2>Commandes classées par heure</h2>
 
-<table>
+<table id="table">
     <thead>
         <tr>
-            <th>Prénom</th>
             <th>Nom</th>
+            <th>Prénom</th>
             <th>Adresse</th>
-            <th>Viennoiserie</th>
-            <th>Céréales</th>
-            <th>Boisson</th>
             <th>Heure</th>
+
+            <th>Croissant</th><th>Qté</th>
+            <th>Pain Choco</th><th>Qté</th>
+            <th>Céréales</th><th>Qté</th>
+            <th>Lait</th><th>Qté</th>
         </tr>
     </thead>
-    <tbody id="table-body"></tbody>
+    <tbody></tbody>
 </table>
 
-<div class="summary" id="resume"></div>
-
-</div>
+<div id="totaux"></div>
 
 <script>
-// Charger commandes
-let commandes = [];
-for(let i=0;i<localStorage.length;i++){
-    const key = localStorage.key(i);
-    if(key.startsWith("commande_")){
-        commandes.push(JSON.parse(localStorage.getItem(key)));
-    }
+// -----------------------
+// FONCTIONS ANTI-UNDEFINED
+// -----------------------
+function safeItem(cat) {
+    return cat && cat.item ? cat.item : "";
+}
+function safeQty(cat) {
+    return cat && typeof cat.qty !== "undefined" ? cat.qty : 0;
 }
 
-// Tri par heure croissante
-commandes.sort((a,b)=> a.heure.localeCompare(b.heure));
+// -----------------------
+// CHARGER LES COMMANDES
+// -----------------------
+let commandes = JSON.parse(localStorage.getItem("commandes") || "[]");
 
-// Affichage dans tableau
-const body = document.getElementById("table-body");
-const total = {
-  Croissant:0, "Pain au chocolat":0,
-  Muesli:0, Trésor:0,
-  "Jus d'orange":0, "Jus de pomme":0, Lait:0
-};
-
-commandes.forEach(cmd=>{
-    body.innerHTML += `
-        <tr>
-            <td>${cmd.prenom}</td>
-            <td>${cmd.nom}</td>
-            <td>${cmd.adresse}</td>
-            <td>${cmd.viennoiserie}</td>
-            <td>${cmd.cereales}</td>
-            <td>${cmd.boisson}</td>
-            <td>${cmd.heure}</td>
-        </tr>`;
-
-    if(total[cmd.viennoiserie] !== undefined) total[cmd.viennoiserie]++;
-    if(total[cmd.cereales] !== undefined) total[cmd.cereales]++;
-    if(total[cmd.boisson] !== undefined) total[cmd.boisson]++;
+// tri par heure croissante
+commandes.sort((a, b) => {
+    return a.heure.localeCompare(b.heure);
 });
 
-// Récapitulatif
-document.getElementById("resume").innerHTML =
-    `<h3>Totaux :</h3>
-     Croissants : ${total["Croissant"]} <br>
-     Pains au chocolat : ${total["Pain au chocolat"]} <br>
-     Muesli : ${total["Muesli"]} <br>
-     Trésor : ${total["Trésor"]} <br>
-     Jus d'orange : ${total["Jus d'orange"]} <br>
-     Jus de pomme : ${total["Jus de pomme"]} <br>
-     Lait : ${total["Lait"]}`;
+let tbody = document.querySelector("tbody");
+
+// totaux
+let totalCroissant = 0;
+let totalPainChoco = 0;
+let totalCereales = 0;
+let totalLait = 0;
+
+// -----------------------
+// AFFICHAGE DES COMMANDES
+// -----------------------
+commandes.forEach(entry => {
+
+    totalCroissant += safeQty(entry.croissant);
+    totalPainChoco += safeQty(entry.painchoco);
+    totalCereales += safeQty(entry.cereales);
+    totalLait += safeQty(entry.lait);
+
+    let tr = document.createElement("tr");
+
+    tr.innerHTML = `
+        <td>${entry.nom}</td>
+        <td>${entry.prenom}</td>
+        <td>${entry.adresse}</td>
+        <td>${entry.heure}</td>
+
+        <td>${safeItem(entry.croissant)}</td>
+        <td>${safeQty(entry.croissant)}</td>
+
+        <td>${safeItem(entry.painchoco)}</td>
+        <td>${safeQty(entry.painchoco)}</td>
+
+        <td>${safeItem(entry.cereales)}</td>
+        <td>${safeQty(entry.cereales)}</td>
+
+        <td>${safeItem(entry.lait)}</td>
+        <td>${safeQty(entry.lait)}</td>
+    `;
+
+    tbody.appendChild(tr);
+});
+
+// -----------------------
+// AFFICHAGE DES TOTAUX
+// -----------------------
+document.getElementById("totaux").innerHTML = `
+    <h3>Totaux :</h3>
+    <p><b>Croissants :</b> ${totalCroissant}</p>
+    <p><b>Pains au chocolat :</b> ${totalPainChoco}</p>
+    <p><b>Céréales :</b> ${totalCereales}</p>
+    <p><b>Lait :</b> ${totalLait}</p>
+`;
 </script>
 
 </body>
