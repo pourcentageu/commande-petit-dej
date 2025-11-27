@@ -2,48 +2,45 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Merci - Les Sh'artlock Holmes</title>
+<title>Merci !</title>
 <style>
 body {
     margin: 0;
-    padding: 0;
-    font-family: "Georgia", serif;
-    background-image: url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=1950&q=80');
+    font-family: Georgia, serif;
+    background-image: url('https://images.unsplash.com/photo-1505682634904-d7c9b2a2a3ee?auto=format&fit=crop&w=1950&q=80');
     background-size: cover;
     background-position: center;
-    color: #f0e8d8;
-    text-shadow: 2px 2px 5px #000;
-    animation: fadeIn 1.8s ease-in-out;
+    color: #f2e6d0;
+    text-align: center;
 }
-
-.container {
+.overlay {
+    margin: 100px auto;
+    max-width: 700px;
     background: rgba(0,0,0,0.65);
     padding: 40px;
     border-radius: 12px;
-    max-width: 750px;
-    margin: 150px auto;
-    text-align: center;
+    animation: fadeIn 1s;
 }
-
-h1 {
-    font-size: 48px;
+@keyframes fadeIn {
+    from {opacity:0; transform: scale(0.9);}
+    to   {opacity:1; transform: scale(1);}
 }
-
-p {
-    font-size: 24px;
+.logo {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 140px;
 }
 </style>
 </head>
-
 <body>
-<div class="container">
-    <h1>Merci pour votre commande !</h1>
-    <p>Votre petit-déjeuner est désormais entre les mains  
-    des détectives du <strong>BDA – Les Sh'artlock Holmes</strong>.</p>
 
-    <p style="margin-top:20px;font-size:28px;">
-        🕵️‍♂️ Et n'oubliez pas : votez <strong>Les Sh'artlock Holmes</strong> !
-    </p>
+<img src="logo.png" class="logo">
+
+<div class="overlay">
+    <h1>Merci pour votre commande !</h1>
+    <p>Et n’oubliez pas de voter pour <strong>Sh’Artlock Holmes</strong> 🔍🎨</p>
 </div>
+
 </body>
 </html>
