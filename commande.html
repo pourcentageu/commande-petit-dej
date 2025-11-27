@@ -2,93 +2,122 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Commande - Petit Déjeuner Mystérieux</title>
+<title>Commande – Sh'Artlock Holmes</title>
+
 <style>
-body {
-    margin: 0;
-    padding: 0;
-    font-family: "Georgia", serif;
-    background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1950&q=80');
-    background-size: cover;
-    background-position: center;
-    color: #f2e6d0;
-}
-.overlay {
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(3px);
-    padding: 30px;
-    max-width: 750px;
-    margin: 40px auto;
-    border-radius: 12px;
-    animation: slideIn 1.2s ease-out;
-}
-@keyframes slideIn {
-    from {transform: translateY(40px); opacity: 0;}
-    to {transform: translateY(0); opacity: 1;}
-}
-label {
-    display: block;
-    margin-top: 15px;
-    font-size: 20px;
-}
-input, select {
-    width: 100%;
-    padding: 12px;
-    margin-top: 5px;
-    border-radius: 8px;
-    border: none;
-    font-size: 18px;
-}
-button {
-    margin-top: 25px;
-    padding: 15px;
-    width: 100%;
-    font-size: 22px;
-    cursor: pointer;
-    border: none;
-    background: #b89b5e;
-    color: #fff;
-    border-radius: 10px;
-    transition: 0.3s;
-}
-button:hover {background: #d0b77a; transform: scale(1.05);}
-.warning {
-    background: rgba(120,0,0,0.7);
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    font-size: 18px;
-    text-align: center;
-}
-.logo {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    width: 140px;
-}
+    body {
+        font-family: "Georgia", serif;
+        background-image: url('https://images.unsplash.com/photo-1549887534-3db1bd59dcca?auto=format&fit=crop&w=1600&q=80');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        margin: 0;
+        color: #222;
+    }
+
+    header {
+        width: 100%;
+        background: rgba(0,0,0,0.65);
+        padding: 20px;
+        text-align: center;
+        color: white;
+        font-size: 32px;
+        letter-spacing: 2px;
+        position: relative;
+    }
+
+    #logo {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        width: 110px;
+    }
+
+    #formulaire {
+        width: 60%;
+        margin: 40px auto;
+        background: rgba(255,255,255,0.92);
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px);}
+        to   { opacity: 1; transform: translateY(0);}
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0 14px 0;
+        border-radius: 6px;
+        border: 1px solid #555;
+        font-size: 16px;
+    }
+
+    label {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    button {
+        background: #3b2f2f;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 18px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 15px;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #6b4a4a;
+        transform: scale(1.03);
+    }
+
+    .warning {
+        text-align: center;
+        background: rgba(255,230,0,0.8);
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 8px;
+        font-weight: bold;
+    }
 </style>
 </head>
 
 <body>
-<img src="logo.png" class="logo">
 
-<div class="overlay">
-    <h1>Formulaire de Commande 🔍</h1>
-    <p class="warning">⚠️ Une seule commande par personne est autorisée.</p>
+<header>
+    Commander mon petit déjeuner  
+    <img id="logo" src="https://pourcentageu.github.io/commande-petit-dej/logo.png">
+</header>
 
-    <form onsubmit="return envoyerCommande(event)">
+<div id="formulaire">
+
+    <div class="warning">⚠ Une seule commande par personne est autorisée.</div>
+
+    <form id="form">
         <label>Prénom</label>
-        <input type="text" id="prenom" required>
+        <input id="prenom" required>
 
         <label>Nom</label>
-        <input type="text" id="nom" required>
+        <input id="nom" required>
 
         <label>Adresse / Lieu de livraison</label>
-        <input type="text" id="adresse" required>
+        <input id="adresse" required>
+
+        <label>Heure de livraison (entre 8h00 et 9h00)</label>
+        <input type="time" id="heure" required>
 
         <label>Viennoiserie (1 maximum)</label>
         <select id="viennoiserie">
-            <option value="">Aucune</option>
+            <option value="">Aucun</option>
             <option value="Croissant">Croissant</option>
             <option value="Pain au chocolat">Pain au chocolat</option>
         </select>
@@ -108,51 +137,76 @@ button:hover {background: #d0b77a; transform: scale(1.05);}
             <option value="Lait">Lait</option>
         </select>
 
-        <label>Heure de livraison (08:00 → 09:00)</label>
-        <input type="time" id="heure" required step="60">
-
-        <button type="submit">Valider ma commande ✔️</button>
+        <button type="submit">Valider ma commande</button>
     </form>
 </div>
 
 <script>
-function envoyerCommande(e) {
+// Empêcher double commande
+if (localStorage.getItem("commande_effectuee") === "oui") {
+    alert("Vous avez déjà passé une commande !");
+    window.location = "merci.html";
+}
+
+// Vérification heure
+function heureValide(h) {
+    const [hh, mm] = h.split(":").map(Number);
+    return hh === 8 || (hh === 9 && mm === 0);
+}
+
+document.getElementById("form").addEventListener("submit", function(e){
     e.preventDefault();
 
-    const prenom = document.getElementById("prenom").value.trim();
-    const nom = document.getElementById("nom").value.trim();
-    const adresse = document.getElementById("adresse").value.trim();
-    const viennoiserie = document.getElementById("viennoiserie").value;
-    const cereales = document.getElementById("cereales").value;
-    const boisson = document.getElementById("boisson").value;
+    const prenom = document.getElementById("prenom").value;
+    const nom = document.getElementById("nom").value;
+    const adresse = document.getElementById("adresse").value;
     const heure = document.getElementById("heure").value;
 
-    const h = parseInt(heure.split(":")[0]);
-    const m = parseInt(heure.split(":")[1]);
-    if (h !== 8 && !(h === 9 && m === 0)) {
-        alert("L’heure doit être comprise entre 08:00 et 09:00.");
-        return false;
+    if (!heureValide(heure)) {
+        alert("L’heure doit être entre 08:00 et 09:00.");
+        return;
     }
 
-    if (localStorage.getItem("commande_" + prenom + "_" + nom)) {
-        alert("Vous avez déjà passé une commande !");
-        return false;
-    }
+    let v = document.getElementById("viennoiserie").value;
+    let c = document.getElementById("cereales").value;
+    let b = document.getElementById("boisson").value;
 
-    const data = {
+    let commande = {
         prenom,
         nom,
         adresse,
-        viennoiserie: viennoiserie || "—",
-        cereales: cereales || "—",
-        boisson: boisson || "—",
-        heure
+        heure,
+
+        croissant: {
+            item: v === "Croissant" ? "Croissant" : "",
+            qty: v === "Croissant" ? 1 : 0
+        },
+
+        painchoco: {
+            item: v === "Pain au chocolat" ? "Pain au chocolat" : "",
+            qty: v === "Pain au chocolat" ? 1 : 0
+        },
+
+        cereales: {
+            item: c,
+            qty: c ? 1 : 0
+        },
+
+        lait: {
+            item: b === "Lait" ? "Lait" : "",
+            qty: b === "Lait" ? 1 : 0
+        }
     };
 
-    localStorage.setItem("commande_" + prenom + "_" + nom, JSON.stringify(data));
+    let commandes = JSON.parse(localStorage.getItem("commandes") || "[]");
+    commandes.push(commande);
+    localStorage.setItem("commandes", JSON.stringify(commandes));
 
-    window.location.href = "merci.html";
-}
+    localStorage.setItem("commande_effectuee", "oui");
+
+    window.location = "merci.html";
+});
 </script>
+
 </body>
 </html>
