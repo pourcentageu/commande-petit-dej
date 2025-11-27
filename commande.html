@@ -111,13 +111,19 @@
 </form>
 
 <script>
+// --- Configuration GitHub ---
+const GITHUB_USER = "TON_USERNAME";      // <-- remplace par ton nom d'utilisateur GitHub
+const GITHUB_REPO = "TON_REPO";          // <-- remplace par ton dépôt
+const GITHUB_FILE = "commandes.json";    // fichier où stocker les commandes
+const GITHUB_TOKEN = "TON_TOKEN";        // <-- remplace par ton token GitHub
+
 // --- Vérification heure ---
 function heureValide(horaire) {
     const [hh, mm] = horaire.split(":").map(Number);
     return (hh === 8 && mm >= 0 && mm <= 59) || (hh === 9 && mm === 0);
 }
 
-document.getElementById("form").addEventListener("submit", function(e){
+document.getElementById("form").addEventListener("submit", async function(e){
     e.preventDefault();
 
     const heure = document.getElementById("heure").value;
@@ -131,22 +137,42 @@ document.getElementById("form").addEventListener("submit", function(e){
         nom: document.getElementById("nom").value,
         adresse: document.getElementById("adresse").value,
         heure: heure,
-
         viennoiserie: document.getElementById("viennoiserie").value,
         cereales: document.getElementById("cereales").value,
         boisson: document.getElementById("boisson").value
     };
 
-    let commandes = JSON.parse(localStorage.getItem("commandes") || "[]");
-    commandes.push(commande);
-    localStorage.setItem("commandes", JSON.stringify(commandes));
+    try {
+        // Récupérer le fichier commandes.json existant
+        let res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`);
+        let data = await res.json();
+        let sha = data.sha;
+        let commandes = JSON.parse(atob(data.content));
+        commandes.push(commande);
 
-    localStorage.setItem("commande_effectuee", "oui");
+        // Mettre à jour le fichier sur GitHub
+        await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`, {
+            method: "PUT",
+            headers: {
+                "Authorization": "token " + GITHUB_TOKEN,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: "Nouvelle commande ajoutée",
+                content: btoa(JSON.stringify(commandes, null, 2)),
+                sha: sha
+            })
+        });
 
-    window.location = "merci.html";
+        alert("Commande envoyée !");
+        window.location = "merci.html";
+
+    } catch (err) {
+        console.error(err);
+        alert("Erreur lors de l'envoi de la commande.");
+    }
 });
 </script>
 
 </body>
 </html>
-
