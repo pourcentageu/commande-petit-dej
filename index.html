@@ -2,60 +2,62 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Bienvenue - Les Sh'artlock Holmes</title>
+<title>Bienvenue - Sh’Artlock Holmes</title>
 <style>
 body {
     margin: 0;
-    padding: 0;
-    font-family: "Georgia", serif;
-    background-image: url('https://images.unsplash.com/photo-1520694478166-daaaaec95b69?auto=format&fit=crop&w=1950&q=80');
+    font-family: Georgia, serif;
+    background-image: url('https://images.unsplash.com/photo-1581091870622-3efbb9dcecdc?auto=format&fit=crop&w=1950&q=80');
     background-size: cover;
     background-position: center;
-    color: #f5e6c8;
-    text-shadow: 2px 2px 5px #000;
-    animation: fadeIn 2s ease-in-out;
+    color: #f2e6d0;
 }
-@keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
-
-.container {
-    background: rgba(0,0,0,0.65);
-    padding: 40px;
-    border-radius: 12px;
-    max-width: 700px;
-    margin: 120px auto;
-    text-align: center;
+.overlay {
+    background: rgba(0,0,0,0.6);
     backdrop-filter: blur(3px);
+    max-width: 800px;
+    margin: 80px auto;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    animation: fadeIn 1.3s ease-out;
 }
-
-h1 {
-    font-size: 50px;
-    margin-bottom: 10px;
+@keyframes fadeIn {
+    from {opacity:0; transform: translateY(30px);}
+    to   {opacity:1; transform: translateY(0);}
 }
-
 button {
-    margin-top: 20px;
-    padding: 15px 30px;
+    padding: 18px 25px;
     font-size: 22px;
-    cursor: pointer;
     border: none;
-    background: #b89b5e;
-    color: #fff;
     border-radius: 10px;
+    background: #b89b5e;
+    color: white;
+    cursor: pointer;
     transition: 0.3s;
 }
-button:hover {
-    background: #d0b77a;
-    transform: scale(1.05);
+button:hover {background:#d0b77a; transform: scale(1.08);}
+.logo {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 140px;
 }
 </style>
 </head>
 <body>
-<div class="container">
-    <h1>Bienvenue, détectives !</h1>
-    <p>Le mystère du petit-déjeuner parfait vous attend…  
-       Et n'oubliez pas : votez <strong>Les Sh'artlock Holmes</strong> !</p>
 
-    <button onclick="location.href='commande.html'">Accéder à la commande 🔍</button>
+<img src="logo.png" class="logo">
+
+<div class="overlay">
+    <h1>Bienvenue, détectives ! 🔍</h1>
+    <p>Préparez-vous pour un petit déjeuner digne des plus grandes enquêtes…</p>
+    <h2>Votez pour <strong>Sh’Artlock Holmes</strong> !</h2>
+    <br>
+    <a href="commande.html">
+        <button>Commander mon petit déjeuner</button>
+    </a>
 </div>
+
 </body>
 </html>
